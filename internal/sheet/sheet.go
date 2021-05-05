@@ -19,4 +19,10 @@ type QueryClient interface {
 }
 
 type Client struct {
+	SheetId string
+	PageId  string
+}
+
+func (c Client) ReadSheetsAPI() ([]RawQueryResult, error) {
+	return nil, CannotReadFromGoogleErr
 }
