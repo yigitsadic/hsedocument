@@ -11,9 +11,10 @@ var (
 )
 
 type QueryResult struct {
-	MaskedFirstName string    `json:"masked_first_name"`
-	MaskedLastName  string    `json:"masked_last_name"`
+	MaskedFirstName string    `json:"first_name"`
+	MaskedLastName  string    `json:"last_name"`
 	QRCode          string    `json:"qr_code"`
+	CertificateName string    `json:"certificate_name"`
 	LastUpdated     time.Time `json:"last_updated"`
 }
 
