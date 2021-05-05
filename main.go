@@ -56,7 +56,7 @@ func main() {
 		}
 	}()
 
-	// Read port from ENV variable. If not found, default to 5050
+	// Read port from ENV variable. If not found, default to 8080
 	port, addr := os.Getenv("PORT"), os.Getenv("LISTEN_ADDR")
 	if port == "" {
 		port = "8080"
