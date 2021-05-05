@@ -39,18 +39,18 @@ func MaskLastName(lastName string) string {
 
 	var maskedPart, visiblePart, result string
 
-	if utf8.RuneCountInString(lastName) == 2 {
+	if utf8.RuneCountInString(lastName) < 3 {
 		maskedPart = "*"
-	} else if utf8.RuneCountInString(lastName) > 2 && utf8.RuneCountInString(lastName) < 5 {
+	} else if utf8.RuneCountInString(lastName) <= 4 {
 		maskedPart = "**"
 	} else {
 		maskedPart = "***"
 	}
 
-	if utf8.RuneCountInString(lastName) <= 3 {
-		visiblePart = string([]rune(lastName)[utf8.RuneCountInString(lastName)-1:])
+	if utf8.RuneCountInString(lastName) < 4 {
+		visiblePart = string([]rune(lastName)[utf8.RuneCountInString(lastName)-1])
 	} else {
-		visiblePart = string([]rune(lastName)[utf8.RuneCountInString(lastName)-4:])
+		visiblePart = string([]rune(lastName)[utf8.RuneCountInString(lastName)-2:])
 	}
 
 	result = maskedPart + visiblePart
