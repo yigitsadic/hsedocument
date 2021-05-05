@@ -17,18 +17,20 @@ var (
 )
 
 type RawQueryResult struct {
-	FirstName       string
-	LastName        string
-	QRCode          string
-	CertificateName string
+	FirstName            string
+	LastName             string
+	QRCode               string
+	CertificateName      string
+	CertificateCreatedAt string
 }
 
 type QueryResult struct {
-	MaskedFirstName string    `json:"first_name"`
-	MaskedLastName  string    `json:"last_name"`
-	QRCode          string    `json:"qr_code"`
-	CertificateName string    `json:"certificate_name"`
-	LastUpdated     time.Time `json:"last_updated"`
+	MaskedFirstName      string    `json:"first_name"`
+	MaskedLastName       string    `json:"last_name"`
+	QRCode               string    `json:"qr_code"`
+	CertificateName      string    `json:"certificate_name"`
+	CertificateCreatedAt string    `json:"certificate_created_at"`
+	LastUpdated          time.Time `json:"last_updated"`
 }
 
 type Store struct {
@@ -77,11 +79,12 @@ func (s *Store) WriteToStore(results []RawQueryResult) {
 
 	for _, result := range results {
 		s.QueryResults[result.QRCode] = &QueryResult{
-			MaskedFirstName: name_masker.MaskFirstName(result.FirstName),
-			MaskedLastName:  name_masker.MaskLastName(result.LastName),
-			QRCode:          result.QRCode,
-			CertificateName: result.CertificateName,
-			LastUpdated:     time.Now(),
+			MaskedFirstName:      name_masker.MaskFirstName(result.FirstName),
+			MaskedLastName:       name_masker.MaskLastName(result.LastName),
+			QRCode:               result.QRCode,
+			CertificateName:      result.CertificateName,
+			CertificateCreatedAt: result.CertificateCreatedAt,
+			LastUpdated:          time.Now(),
 		}
 	}
 }

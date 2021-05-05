@@ -11,7 +11,7 @@ memory içinden kontrol ediliyor ve doğrulanırsa aşağıdaki şekilde yanıt 
 POST https://URL.com/api/certificate_verification
 
 {
-    "token": "eeeeeeeeeeeeeeee",
+    "token": "0c28a727-dae5-4549-87c0-f074e9a40041",
     "qr_code": "Ae1epOlMn"
 }
 ```
@@ -20,10 +20,11 @@ Başarılı yanıt:
 ```json
 {
   "status": "verified",
-  "qr_code": "Ae1epOlMn",
+  "qr_code": "0c28a727-dae5-4549-87c0-f074e9a40041",
   "certificate_name": "İş Sağlığı ve Ergonomi",
   "first_name": "Ay***",
-  "last_name": "Çot***"
+  "last_name": "***oy",
+  "certificate_created_at": "2021-05-03"
 }
 ```
 
@@ -34,7 +35,8 @@ Başarısız yanıt:
   "qr_code": "Ae1epOlMn",
   "certificate_name": null,
   "first_name": null,
-  "last_name": null
+  "last_name": null,
+  "certificate_created_at": null
 }
 ```
 
