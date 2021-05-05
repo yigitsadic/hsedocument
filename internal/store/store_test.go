@@ -42,14 +42,14 @@ func TestStore_QueryInStore(t *testing.T) {
 		MaskedFirstName: "Yi***",
 		MaskedLastName:  "Sa***",
 		QRCode:          "ygt",
-		LastUpdated:     time.Now(),
+		LastUpdated:     time.Now().Format(DateTimeFormat),
 	}
 
 	r2 := QueryResult{
 		MaskedFirstName: "Ay***",
 		MaskedLastName:  "Ço***",
 		QRCode:          "aycn",
-		LastUpdated:     time.Now(),
+		LastUpdated:     time.Now().Format(DateTimeFormat),
 	}
 
 	s.QueryResults[r1.QRCode] = &r1

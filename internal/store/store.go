@@ -10,7 +10,8 @@ import (
 )
 
 const (
-	BaseUrl = "https://hsegroup.uz/kurumsal/certificate_verification?qr_code="
+	BaseUrl        = "https://hsegroup.uz/kurumsal/certificate_verification?qr_code="
+	DateTimeFormat = "04:15 02.01.2006"
 )
 
 var (
@@ -18,13 +19,13 @@ var (
 )
 
 type QueryResult struct {
-	Status               string    `json:"status"`
-	MaskedFirstName      string    `json:"first_name"`
-	MaskedLastName       string    `json:"last_name"`
-	QRCode               string    `json:"qr_code"`
-	CertificateName      string    `json:"certificate_name"`
-	CertificateCreatedAt string    `json:"certificate_created_at"`
-	LastUpdated          time.Time `json:"last_updated"`
+	Status               string `json:"status"`
+	MaskedFirstName      string `json:"first_name"`
+	MaskedLastName       string `json:"last_name"`
+	QRCode               string `json:"qr_code"`
+	CertificateName      string `json:"certificate_name"`
+	CertificateCreatedAt string `json:"certificate_created_at"`
+	LastUpdated          string `json:"last_updated"`
 }
 
 type Store struct {
@@ -70,9 +71,6 @@ func (s *Store) QueryInStore(qrCode string) (res *QueryResult, err error) {
 
 // Writes raw query result to store with masking names.
 func (s *Store) WriteToStore(results []sheet.RawQueryResult) {
-	s.Mu.Lock()
-	defer s.Mu.Unlock()
-
 	for _, result := range results {
 		s.QueryResults[result.QRCode] = &QueryResult{
 			Status:               "verified",
@@ -81,7 +79,7 @@ func (s *Store) WriteToStore(results []sheet.RawQueryResult) {
 			QRCode:               result.QRCode,
 			CertificateName:      result.CertificateName,
 			CertificateCreatedAt: result.CertificateCreatedAt,
-			LastUpdated:          time.Now(),
+			LastUpdated:          time.Now().Format(DateTimeFormat),
 		}
 	}
 }
