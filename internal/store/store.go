@@ -2,8 +2,13 @@ package store
 
 import (
 	"errors"
+	"strings"
 	"sync"
 	"time"
+)
+
+const (
+	BaseUrl = "https://hsegroup.uz/kurumsal/certificate_verification?qr_code="
 )
 
 var (
@@ -33,17 +38,27 @@ type Store struct {
 }
 
 // Reads given QR code from store.
-func (s *Store) QueryInStore(qr_code string) (*QueryResult, error) {
+func (s *Store) QueryInStore(qrCode string) (res *QueryResult, err error) {
 	s.Mu.Lock()
 	defer s.Mu.Unlock()
 
-	result, ok := s.QueryResults[qr_code]
+	qrCode = strings.TrimSpace(qrCode)
 
-	if ok {
-		return result, nil
-	} else {
-		return nil, QRCodeNotFoundErr
+	// Search with qr code only
+	if result, ok := s.QueryResults[qrCode]; ok {
+		res = result
+
+		return
 	}
+
+	// Search with full path
+	if result, ok := s.QueryResults[strings.TrimPrefix(qrCode, BaseUrl)]; ok {
+		res = result
+
+		return
+	}
+
+	return nil, QRCodeNotFoundErr
 }
 
 // Writes raw query result to store with masking names.

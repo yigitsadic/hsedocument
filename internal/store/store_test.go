@@ -29,6 +29,26 @@ func TestStore_QueryInStore(t *testing.T) {
 	s.QueryResults[r1.QRCode] = &r1
 	s.QueryResults[r2.QRCode] = &r2
 
+	t.Run("it should trim whitespaces", func(t *testing.T) {
+		got, err := s.QueryInStore("  " + r1.QRCode + "  ")
+
+		if err != nil {
+			t.Errorf("unexpected to get an error but got=%s", err)
+		}
+
+		if got.MaskedFirstName != r1.MaskedFirstName {
+			t.Errorf("expected return not satisfied for masked first name")
+		}
+
+		if got.MaskedLastName != r1.MaskedLastName {
+			t.Errorf("expected return not satisfied for masked last name")
+		}
+
+		if got.QRCode != r1.QRCode {
+			t.Errorf("expected return not satisfied for QR code")
+		}
+	})
+
 	t.Run("it should return if finds", func(a *testing.T) {
 		got, err := s.QueryInStore(r1.QRCode)
 		if err != nil {
@@ -57,6 +77,25 @@ func TestStore_QueryInStore(t *testing.T) {
 
 		if err != QRCodeNotFoundErr {
 			t.Errorf("expected error was=%s but got=%s", QRCodeNotFoundErr, err)
+		}
+	})
+
+	t.Run("it should find with full url", func(t *testing.T) {
+		got, err := s.QueryInStore(BaseUrl + r1.QRCode)
+		if err != nil {
+			t.Errorf("unexpected to get an error but got=%s", err)
+		}
+
+		if got.MaskedFirstName != r1.MaskedFirstName {
+			t.Errorf("expected return not satisfied for masked first name")
+		}
+
+		if got.MaskedLastName != r1.MaskedLastName {
+			t.Errorf("expected return not satisfied for masked last name")
+		}
+
+		if got.QRCode != r1.QRCode {
+			t.Errorf("expected return not satisfied for QR code")
 		}
 	})
 }
