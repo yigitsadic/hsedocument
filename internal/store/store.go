@@ -86,6 +86,9 @@ func (s *Store) WriteToStore(results []sheet.RawQueryResult) {
 
 // Queries over given client and writes them to store.
 func (s *Store) FetchFromSheets() error {
+	s.Mu.Lock()
+	defer s.Mu.Unlock()
+
 	got, err := s.Client.ReadSheetsAPI()
 	if err != nil {
 		return err
