@@ -1,9 +1,8 @@
 package guard
 
 import (
-	"errors"
-	"fmt"
-	"github.com/gofiber/fiber/v2"
+	"encoding/json"
+	"net/http"
 	"os"
 )
 
@@ -11,22 +10,27 @@ type token struct {
 	Token string `json:"token"`
 }
 
-func AuthenticationGuard(c *fiber.Ctx) error {
-	expectedToken := os.Getenv("TOKEN")
-	if expectedToken == "" {
-		return errors.New("unable to continue")
+var (
+	unauthorizedResponse = map[string]string{
+		"message": "unauthorized",
 	}
+)
 
-	var t token
-	err := c.BodyParser(&t)
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
+func AuthenticationGuard(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		expectedToken := os.Getenv("TOKEN")
+		if expectedToken == "" {
+			json.NewEncoder(writer).Encode(unauthorizedResponse)
+			return
+		}
 
-	if t.Token == expectedToken {
-		return c.Next()
-	}
+		var t token
 
-	return errors.New("unable to continue")
+		if t.Token == expectedToken {
+			next.ServeHTTP(writer, request.WithContext(request.Context()))
+			return
+		}
+
+		json.NewEncoder(writer).Encode(unauthorizedResponse)
+	})
 }

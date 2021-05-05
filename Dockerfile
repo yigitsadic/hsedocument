@@ -1,13 +1,13 @@
 FROM golang:1.16-alpine AS compiler
 
-WORKDIR /app/src
-
+WORKDIR /src/app
+COPY go.mod go.sum ./
+RUN go mod download
 COPY . .
 
-RUN go build -o sertifikadogrula
+RUN CGO_ENABLED=0 go build -o ./a.out .
 
-FROM alpine
+FROM gcr.io/distroless/static
 
-COPY --from=compiler /app/src/sertifikadogrula /sertifikadogrula
-
-ENTRYPOINT ["/sertifikadogrula"]
+COPY --from=compiler /src/app/a.out /server
+ENTRYPOINT ["/server"]

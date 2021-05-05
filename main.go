@@ -1,15 +1,19 @@
 package main
 
 import (
-	"fmt"
-	"github.com/gofiber/fiber/v2"
+	"encoding/json"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/yigitsadic/sertifikadogrula/internal/guard"
 	"github.com/yigitsadic/sertifikadogrula/internal/sheet"
 	"github.com/yigitsadic/sertifikadogrula/internal/store"
 	"log"
+	"net"
+	"net/http"
+	"time"
+
 	"os"
 	"sync"
-	"time"
 )
 
 var (
@@ -24,12 +28,6 @@ func initialGet() {
 }
 
 func main() {
-	// Read port from ENV variable. If not found, default to 5050
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "5050"
-	}
-
 	// Read Sheet ID from ENV.
 	sheetId := os.Getenv("SHEET_ID")
 	if sheetId == "" {
@@ -41,8 +39,7 @@ func main() {
 	})
 	initializeOnce.Do(initialGet)
 
-	app := fiber.New()
-
+	// Every 1 hour make request to Google Sheets.
 	go func() {
 		for {
 			select {
@@ -54,37 +51,44 @@ func main() {
 		}
 	}()
 
-	app.Use(guard.AuthenticationGuard)
-	app.Post("/api/certificate_verification", func(ctx *fiber.Ctx) error {
-		b := struct {
-			QRCode string `json:"qr_code"`
-		}{}
+	// Read port from ENV variable. If not found, default to 5050
+	port, addr := os.Getenv("PORT"), os.Getenv("LISTEN_ADDR")
+	if port == "" {
+		port = "8080"
+	}
 
-		err = ctx.BodyParser(&b)
-		if err != nil {
-			return err
-		}
+	r := chi.NewRouter()
+	r.Use(middleware.Logger)
+	r.Use(guard.AuthenticationGuard)
 
-		res, err := s.QueryInStore(b.QRCode)
+	r.Post("/api/certificate_verification", func(writer http.ResponseWriter, request *http.Request) {
+		/*
+			b := struct {
+					QRCode string `json:"qr_code"`
+				}{}
 
-		if err != nil {
-			if err == store.QRCodeNotFoundErr {
-				return ctx.JSON(store.QueryResult{
-					Status:               "not_verified",
-					MaskedFirstName:      "",
-					MaskedLastName:       "",
-					QRCode:               b.QRCode,
-					CertificateName:      "",
-					CertificateCreatedAt: "",
-					LastUpdated:          time.Now(),
-				})
-			}
+				err = ctx.BodyParser(&b)
+				if err != nil {
+					return err
+				}
 
-			return err
-		}
+				res, err := s.QueryInStore(b.QRCode)
+		*/
 
-		return ctx.JSON(res)
+		json.NewEncoder(writer).Encode(store.QueryResult{
+			Status:               "not_verified",
+			MaskedFirstName:      "",
+			MaskedLastName:       "",
+			QRCode:               "6f06ce23-7442-418c-886d-43af1f656808",
+			CertificateName:      "",
+			CertificateCreatedAt: "",
+			LastUpdated:          time.Now(),
+		})
 	})
 
-	app.Listen(fmt.Sprintf(":%s", port))
+	listenAddr := net.JoinHostPort(addr, port)
+
+	log.Println("Server is starting on", listenAddr)
+	// Start server.
+	log.Fatal(http.ListenAndServe(listenAddr, r))
 }

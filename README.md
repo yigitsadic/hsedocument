@@ -2,8 +2,8 @@
 
 1 saatte bir Google Sheets içindeki sertifikalar memory'e alınıyor.
 
-Gelen request içindeki JWT token parçalanıyor. Eğer doğrulama başarılı ise 
-memory içinden kontrol ediliyor ve doğrulanırsa aşağıdaki şekilde yanıt dönüyor.
+Gelen request içindeki token ENV içinde verilen token ile karşılaştırılıyor. Eğer eşleşme sağlanırsa
+yanıt dönülüyor.
 
 Örnek Request:
 
