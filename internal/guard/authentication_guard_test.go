@@ -19,6 +19,10 @@ func TestAuthenticationGuard(t *testing.T) {
 	ts := httptest.NewServer(a.Guard(hf))
 	defer ts.Close()
 
+	var response = struct {
+		Message string `json:"message"`
+	}{}
+
 	t.Run("it should handle good token", func(t *testing.T) {
 		req, err := buildRequest(t, ts.URL, "ABC")
 		if err != nil {
@@ -49,6 +53,12 @@ func TestAuthenticationGuard(t *testing.T) {
 		if res != nil && res.StatusCode != http.StatusUnauthorized {
 			t.Errorf("expected to get 401 response")
 		}
+
+		json.NewDecoder(res.Body).Decode(&response)
+
+		if response.Message != "unauthorized" {
+			t.Errorf("unexpected response. got=%+v", response)
+		}
 	})
 
 	t.Run("it should handle empty body", func(t *testing.T) {
@@ -64,6 +74,12 @@ func TestAuthenticationGuard(t *testing.T) {
 
 		if res != nil && res.StatusCode != http.StatusUnauthorized {
 			t.Errorf("expected to get 401 response")
+		}
+
+		json.NewDecoder(res.Body).Decode(&response)
+
+		if response.Message != "unauthorized" {
+			t.Errorf("unexpected response. got=%+v", response)
 		}
 	})
 
