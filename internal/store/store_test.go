@@ -1,16 +1,12 @@
 package store
 
 import (
-	"sync"
 	"testing"
 	"time"
 )
 
 func TestStore_QueryInStore(t *testing.T) {
-	s := &Store{
-		QueryResults: make(map[string]*QueryResult),
-		Mu:           &sync.Mutex{},
-	}
+	s := NewStore()
 
 	r1 := QueryResult{
 		MaskedFirstName: "Yi***",
@@ -119,18 +115,18 @@ func TestStore_WriteToStore(t *testing.T) {
 	expectedResult := make(map[string]*QueryResult)
 	expectedResult["ABC"] = &QueryResult{
 		MaskedFirstName: "Ay***",
-		MaskedLastName:  "Ço***",
+		MaskedLastName:  "***oy",
 		QRCode:          "ABC",
 		CertificateName: "Lorem",
 	}
 	expectedResult["DEF"] = &QueryResult{
 		MaskedFirstName: "Yi***",
-		MaskedLastName:  "Sa***",
+		MaskedLastName:  "***ıç",
 		QRCode:          "DEF",
 		CertificateName: "Ipsum",
 	}
 
-	s := new(Store)
+	s := NewStore()
 
 	s.WriteToStore(input)
 

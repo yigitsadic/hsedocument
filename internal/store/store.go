@@ -2,6 +2,7 @@ package store
 
 import (
 	"errors"
+	"github.com/yigitsadic/sertifikadogrula/internal/name_masker"
 	"strings"
 	"sync"
 	"time"
@@ -37,6 +38,14 @@ type Store struct {
 	Ticker *time.Ticker
 }
 
+func NewStore() *Store {
+	return &Store{
+		QueryResults: make(map[string]*QueryResult),
+		Mu:           &sync.Mutex{},
+		Ticker:       time.NewTicker(1 * time.Hour),
+	}
+}
+
 // Reads given QR code from store.
 func (s *Store) QueryInStore(qrCode string) (res *QueryResult, err error) {
 	s.Mu.Lock()
@@ -68,8 +77,8 @@ func (s *Store) WriteToStore(results []RawQueryResult) {
 
 	for _, result := range results {
 		s.QueryResults[result.QRCode] = &QueryResult{
-			MaskedFirstName: result.FirstName,
-			MaskedLastName:  result.LastName,
+			MaskedFirstName: name_masker.MaskFirstName(result.FirstName),
+			MaskedLastName:  name_masker.MaskLastName(result.LastName),
 			QRCode:          result.QRCode,
 			CertificateName: result.CertificateName,
 			LastUpdated:     time.Now(),
