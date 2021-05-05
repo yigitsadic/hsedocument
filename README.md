@@ -42,5 +42,8 @@ Başarısız yanıt:
 
 ## ENV Variables
 
-- JWT_SECRET
-- Sheet ID
+- TOKEN
+- SHEET_API_KEY
+- SHEET_ID
+- PORT
+- LISTEN_ADDR

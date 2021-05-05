@@ -39,6 +39,11 @@ func main() {
 		log.Fatalln("TOKEN cannot be empty")
 	}
 
+	apiKey := os.Getenv("SHEET_API_KEY")
+	if apiKey == "" {
+		log.Fatalln("SHEET_API_KEY cannot be empty")
+	}
+
 	s = store.NewStore(sheet.Client{
 		SheetId: sheetId,
 	})

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"google.golang.org/api/option"
 	"google.golang.org/api/sheets/v4"
 )
 
@@ -25,10 +26,15 @@ type QueryClient interface {
 
 type Client struct {
 	SheetId string
+	APIKey  string
 }
 
 func (c Client) ReadSheetsAPI() ([]RawQueryResult, error) {
-	srv, err := sheets.NewService(context.TODO())
+	srv, err := sheets.NewService(
+		context.Background(),
+		option.WithScopes(sheets.SpreadsheetsReadonlyScope),
+		option.WithAPIKey(c.APIKey),
+	)
 	if err != nil {
 		return nil, fmt.Errorf("unable to retrieve Sheets client: %v", err)
 	}
