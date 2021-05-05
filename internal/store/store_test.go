@@ -60,3 +60,56 @@ func TestStore_QueryInStore(t *testing.T) {
 		}
 	})
 }
+
+func TestStore_WriteToStore(t *testing.T) {
+	input := []RawQueryResult{
+		{
+			FirstName:       "Aycan",
+			LastName:        "Çotoy",
+			QRCode:          "ABC",
+			CertificateName: "Lorem",
+		},
+		{
+			FirstName:       "Yiğit",
+			LastName:        "Sadıç",
+			QRCode:          "DEF",
+			CertificateName: "Ipsum",
+		},
+	}
+
+	expectedResult := make(map[string]*QueryResult)
+	expectedResult["ABC"] = &QueryResult{
+		MaskedFirstName: "Ay***",
+		MaskedLastName:  "Ço***",
+		QRCode:          "ABC",
+		CertificateName: "Lorem",
+	}
+	expectedResult["DEF"] = &QueryResult{
+		MaskedFirstName: "Yi***",
+		MaskedLastName:  "Sa***",
+		QRCode:          "DEF",
+		CertificateName: "Ipsum",
+	}
+
+	s := new(Store)
+
+	s.WriteToStore(input)
+
+	for k, v := range s.QueryResults {
+		if expectedResult[k].MaskedFirstName != v.MaskedFirstName {
+			t.Errorf("expected to see %s but got %s", expectedResult[k].MaskedFirstName, v.MaskedFirstName)
+		}
+
+		if expectedResult[k].MaskedLastName != v.MaskedLastName {
+			t.Errorf("expected to see %s but got %s", expectedResult[k].MaskedLastName, v.MaskedLastName)
+		}
+
+		if expectedResult[k].QRCode != v.QRCode {
+			t.Errorf("expected to see %s but got %s", expectedResult[k].QRCode, v.QRCode)
+		}
+
+		if expectedResult[k].CertificateName != v.CertificateName {
+			t.Errorf("expected to see %s but got %s", expectedResult[k].CertificateName, v.CertificateName)
+		}
+	}
+}
