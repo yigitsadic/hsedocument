@@ -1,12 +1,14 @@
 package guard
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 )
 
-type token struct {
-	Token string `json:"token"`
+type jsonForm struct {
+	Token  string `json:"token"`
+	QrCode string `json:"qr_code"`
 }
 
 var (
@@ -15,17 +17,22 @@ var (
 	}
 )
 
+const QRCodeCtxKey = "qrCode"
+
 type Authentication struct {
 	Secret string
 }
 
 func (a *Authentication) Guard(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		var t token
-		json.NewDecoder(request.Body).Decode(&t)
+		var f jsonForm
+		json.NewDecoder(request.Body).Decode(&f)
+		defer request.Body.Close()
 
-		if t.Token == a.Secret {
-			next.ServeHTTP(writer, request.WithContext(request.Context()))
+		if f.Token == a.Secret {
+			ctx := context.WithValue(request.Context(), QRCodeCtxKey, f.QrCode)
+
+			next.ServeHTTP(writer, request.WithContext(ctx))
 			return
 		}
 

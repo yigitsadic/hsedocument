@@ -8,9 +8,18 @@ import (
 	"testing"
 )
 
+const qrCode = "6f06ce23-7442-418c-886d-43af1f656808"
+
 func TestAuthenticationGuard(t *testing.T) {
+	var readQrCode string
+
 	client := http.Client{}
 	hf := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		v, ok := r.Context().Value(QRCodeCtxKey).(string)
+		if ok {
+			readQrCode = v
+		}
+
 		w.WriteHeader(http.StatusOK)
 	})
 
@@ -36,6 +45,10 @@ func TestAuthenticationGuard(t *testing.T) {
 
 		if res != nil && res.StatusCode != http.StatusOK {
 			t.Errorf("expected to get 200 response")
+		}
+
+		if readQrCode != qrCode {
+			t.Errorf("expected to qr code assigned to ctx")
 		}
 	})
 
@@ -91,7 +104,7 @@ func buildRequest(t *testing.T, url, token string) (*http.Request, error) {
 	b := bytes.Buffer{}
 	json.NewEncoder(&b).Encode(map[string]string{
 		"token":   token,
-		"qr_code": "6f06ce23-7442-418c-886d-43af1f656808",
+		"qr_code": qrCode,
 	})
 	return http.NewRequest(http.MethodPost, url, &b)
 }
