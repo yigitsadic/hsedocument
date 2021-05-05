@@ -3,7 +3,6 @@ package guard
 import (
 	"encoding/json"
 	"net/http"
-	"os"
 )
 
 type token struct {
@@ -16,21 +15,21 @@ var (
 	}
 )
 
-func AuthenticationGuard(next http.Handler) http.Handler {
+type Authentication struct {
+	Secret string
+}
+
+func (a *Authentication) Guard(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		expectedToken := os.Getenv("TOKEN")
-		if expectedToken == "" {
-			json.NewEncoder(writer).Encode(unauthorizedResponse)
-			return
-		}
-
 		var t token
+		json.NewDecoder(request.Body).Decode(&t)
 
-		if t.Token == expectedToken {
+		if t.Token == a.Secret {
 			next.ServeHTTP(writer, request.WithContext(request.Context()))
 			return
 		}
 
+		writer.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(writer).Encode(unauthorizedResponse)
 	})
 }

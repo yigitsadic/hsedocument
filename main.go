@@ -31,7 +31,12 @@ func main() {
 	// Read Sheet ID from ENV.
 	sheetId := os.Getenv("SHEET_ID")
 	if sheetId == "" {
-		log.Panic("Sheet ID cannot be empty")
+		log.Fatalln("Sheet ID cannot be empty")
+	}
+
+	token := os.Getenv("TOKEN")
+	if token == "" {
+		log.Fatalln("TOKEN cannot be empty")
 	}
 
 	s = store.NewStore(sheet.Client{
@@ -57,9 +62,11 @@ func main() {
 		port = "8080"
 	}
 
+	a := guard.Authentication{Secret: token}
+
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
-	r.Use(guard.AuthenticationGuard)
+	r.Use(a.Guard)
 
 	r.Post("/api/certificate_verification", func(writer http.ResponseWriter, request *http.Request) {
 		/*
