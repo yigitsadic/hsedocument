@@ -60,6 +60,53 @@ func TestHandleCertificateVerificationNotFound(t *testing.T) {
 	}
 }
 
+func TestHandleCertificateVerificationNoCtxFound(t *testing.T) {
+	client := http.Client{}
+
+	r := chi.NewRouter()
+	r.Use(func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+			next.ServeHTTP(writer, request)
+		})
+	})
+
+	s := store.NewStore(nil)
+
+	HandleCertificateVerification(r, s)
+
+	ts := httptest.NewServer(r)
+	defer ts.Close()
+
+	req, err := http.NewRequest(http.MethodPost, ts.URL+"/api/certificate_verification", nil)
+	if err != nil {
+		t.Errorf("unexpected to see an error with this stage. error: %s", err)
+	}
+
+	res, err := client.Do(req)
+	if err != nil {
+		t.Errorf("unexpected to see an error with this stage. error: %s", err)
+	}
+
+	var responseObj store.QueryResult
+
+	err = json.NewDecoder(res.Body).Decode(&responseObj)
+	if err != nil {
+		t.Errorf("unexpected to get error while decoding json. err=%s", err)
+	}
+
+	if res.StatusCode != http.StatusOK {
+		t.Errorf("expected status code was %d", http.StatusOK)
+	}
+
+	if defaultQRCode != responseObj.QRCode {
+		t.Errorf("expected to see %q as qr code but got=%q", defaultQRCode, responseObj.QRCode)
+	}
+
+	if "not_verified" != responseObj.Status {
+		t.Errorf("expected status was %q but got %q", "not_verified", responseObj.Status)
+	}
+}
+
 func TestHandleCertificateVerificationFound(t *testing.T) {
 	client := http.Client{}
 

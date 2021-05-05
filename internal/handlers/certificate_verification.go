@@ -9,9 +9,13 @@ import (
 	"time"
 )
 
+const (
+	defaultQRCode = "c9492e5d-44eb-44f5-932b-0898ef52f48b"
+)
+
 func errorResponse(qrCode string) store.QueryResult {
 	if qrCode == "" {
-		qrCode = "c9492e5d-44eb-44f5-932b-0898ef52f48b"
+		qrCode = defaultQRCode
 	}
 
 	return store.QueryResult{
