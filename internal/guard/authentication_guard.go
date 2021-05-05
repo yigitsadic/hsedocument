@@ -30,6 +30,7 @@ func (a *Authentication) Guard(next http.Handler) http.Handler {
 		}
 
 		writer.WriteHeader(http.StatusUnauthorized)
+		writer.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(writer).Encode(unauthorizedResponse)
 	})
 }
