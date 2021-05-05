@@ -33,10 +33,10 @@ Başarısız yanıt:
 {
   "status": "not_verified",
   "qr_code": "Ae1epOlMn",
-  "certificate_name": null,
-  "first_name": null,
-  "last_name": null,
-  "certificate_created_at": null
+  "certificate_name": "",
+  "first_name": "",
+  "last_name": "",
+  "certificate_created_at": ""
 }
 ```
 
@@ -44,4 +44,3 @@ Başarısız yanıt:
 
 - JWT_SECRET
 - Sheet ID
-- Page ID

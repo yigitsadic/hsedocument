@@ -36,15 +36,8 @@ func main() {
 		log.Panic("Sheet ID cannot be empty")
 	}
 
-	// Read Page ID from ENV
-	pageId := os.Getenv("PAGE_ID")
-	if pageId == "" {
-		log.Panic("Page ID cannot be empty")
-	}
-
 	s = store.NewStore(sheet.Client{
 		SheetId: sheetId,
-		PageId:  pageId,
 	})
 	initializeOnce.Do(initialGet)
 
@@ -77,6 +70,7 @@ func main() {
 		if err != nil {
 			if err == store.QRCodeNotFoundErr {
 				return ctx.JSON(store.QueryResult{
+					Status:               "not_verified",
 					MaskedFirstName:      "",
 					MaskedLastName:       "",
 					QRCode:               b.QRCode,
