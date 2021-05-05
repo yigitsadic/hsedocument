@@ -31,9 +31,9 @@ type Client struct {
 
 func (c Client) ReadSheetsAPI() ([]RawQueryResult, error) {
 	srv, err := sheets.NewService(
-		context.Background(),
-		option.WithScopes(sheets.SpreadsheetsReadonlyScope),
+		context.TODO(),
 		option.WithAPIKey(c.APIKey),
+		option.WithScopes(sheets.SpreadsheetsReadonlyScope),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("unable to retrieve Sheets client: %v", err)
@@ -45,9 +45,9 @@ func (c Client) ReadSheetsAPI() ([]RawQueryResult, error) {
 		return nil, err
 	}
 
-	var result []RawQueryResult
+	var results []RawQueryResult
 
-	for _, row := range resp.Values {
+	for _, row := range resp.Values[1:] {
 		if len(row) < 5 {
 			continue
 		}
@@ -59,7 +59,7 @@ func (c Client) ReadSheetsAPI() ([]RawQueryResult, error) {
 		referenceCode, ok5 := row[4].(string)
 
 		if ok1 && ok2 && ok3 && ok4 && ok5 {
-			result = append(result, RawQueryResult{
+			results = append(results, RawQueryResult{
 				FirstName:            firstName,
 				LastName:             lastName,
 				QRCode:               referenceCode,
@@ -71,5 +71,5 @@ func (c Client) ReadSheetsAPI() ([]RawQueryResult, error) {
 		}
 	}
 
-	return result, nil
+	return results, nil
 }
