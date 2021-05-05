@@ -1,17 +1,15 @@
 package main
 
 import (
-	"encoding/json"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/yigitsadic/sertifikadogrula/internal/guard"
+	"github.com/yigitsadic/sertifikadogrula/internal/handlers"
 	"github.com/yigitsadic/sertifikadogrula/internal/sheet"
 	"github.com/yigitsadic/sertifikadogrula/internal/store"
 	"log"
 	"net"
 	"net/http"
-	"time"
-
 	"os"
 	"sync"
 )
@@ -23,8 +21,9 @@ var (
 )
 
 func initialGet() {
-	err = s.FetchFromSheets()
-	log.Println("Error occurred when fetching from Google Sheets. Err:", err)
+	if err = s.FetchFromSheets(); err != nil {
+		log.Println("Error occurred when fetching from Google Sheets. Err:", err)
+	}
 }
 
 func main() {
@@ -46,6 +45,7 @@ func main() {
 
 	s = store.NewStore(sheet.Client{
 		SheetId: sheetId,
+		APIKey:  apiKey,
 	})
 	initializeOnce.Do(initialGet)
 
@@ -72,40 +72,8 @@ func main() {
 	r := chi.NewRouter()
 
 	r.Use(middleware.Logger)
-
-	r.Get("/", func(writer http.ResponseWriter, request *http.Request) {
-		writer.WriteHeader(http.StatusOK)
-	})
-
-	r.With(a.Guard).Post("/api/certificate_verification", func(writer http.ResponseWriter, request *http.Request) {
-		errResponse := store.QueryResult{
-			Status:               "not_verified",
-			MaskedFirstName:      "",
-			MaskedLastName:       "",
-			QRCode:               "6f06ce23-7442-418c-886d-43af1f656808",
-			CertificateName:      "",
-			CertificateCreatedAt: "",
-			LastUpdated:          time.Now(),
-		}
-		writer.Header().Set("Content-Type", "application/json")
-		b := struct {
-			QRCode string `json:"qr_code"`
-		}{}
-
-		err = json.NewDecoder(request.Body).Decode(&b)
-		if err != nil {
-			json.NewEncoder(writer).Encode(errResponse)
-			return
-		}
-
-		res, err := s.QueryInStore(b.QRCode)
-		if err != nil {
-			json.NewEncoder(writer).Encode(errResponse)
-			return
-		}
-
-		json.NewEncoder(writer).Encode(res)
-	})
+	r.Use(a.Guard)
+	handlers.HandleCertificateVerification(r, s)
 
 	listenAddr := net.JoinHostPort(addr, port)
 
