@@ -3,6 +3,7 @@ package store
 import (
 	"errors"
 	"github.com/yigitsadic/sertifikadogrula/internal/name_masker"
+	"github.com/yigitsadic/sertifikadogrula/internal/sheet"
 	"strings"
 	"sync"
 	"time"
@@ -15,14 +16,6 @@ const (
 var (
 	QRCodeNotFoundErr = errors.New("QR Code not found")
 )
-
-type RawQueryResult struct {
-	FirstName            string
-	LastName             string
-	QRCode               string
-	CertificateName      string
-	CertificateCreatedAt string
-}
 
 type QueryResult struct {
 	MaskedFirstName      string    `json:"first_name"`
@@ -37,14 +30,16 @@ type Store struct {
 	QueryResults map[string]*QueryResult
 	Mu           *sync.Mutex
 
+	Client sheet.QueryClient
 	Ticker *time.Ticker
 }
 
-func NewStore() *Store {
+func NewStore(client sheet.QueryClient) *Store {
 	return &Store{
 		QueryResults: make(map[string]*QueryResult),
 		Mu:           &sync.Mutex{},
 		Ticker:       time.NewTicker(1 * time.Hour),
+		Client:       client,
 	}
 }
 
@@ -73,7 +68,7 @@ func (s *Store) QueryInStore(qrCode string) (res *QueryResult, err error) {
 }
 
 // Writes raw query result to store with masking names.
-func (s *Store) WriteToStore(results []RawQueryResult) {
+func (s *Store) WriteToStore(results []sheet.RawQueryResult) {
 	s.Mu.Lock()
 	defer s.Mu.Unlock()
 
@@ -87,4 +82,15 @@ func (s *Store) WriteToStore(results []RawQueryResult) {
 			LastUpdated:          time.Now(),
 		}
 	}
+}
+
+func (s *Store) FetchFromSheets() error {
+	got, err := s.Client.ReadSheetsAPI()
+	if err != nil {
+		return err
+	}
+
+	s.WriteToStore(got)
+
+	return nil
 }
