@@ -10,6 +10,7 @@ Başarılı yanıt:
 {
   "status": "verified",
   "qr_code": "AB12C1ia1w",
+  "certificate_name": "İş Sağlığı ve Ergonomi",
   "first_name": "Ay***",
   "last_name": "Çot***"
 }
@@ -20,8 +21,9 @@ Başarısız yanıt:
 {
   "status": "not_verified",
   "qr_code": "AB12C1ia1w",
-  "first_name": "",
-  "last_name": ""
+  "certificate_name": null,
+  "first_name": null,
+  "last_name": null
 }
 ```
 
