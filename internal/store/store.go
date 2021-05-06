@@ -11,7 +11,7 @@ import (
 
 const (
 	BaseUrl        = "https://hsegroup.uz/kurumsal/certificate_verification?qr_code="
-	DateTimeFormat = "15:04 02.01.2006"
+	DateTimeFormat = "15:04, 02.01.2006"
 )
 
 var (
