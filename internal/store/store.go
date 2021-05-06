@@ -32,8 +32,9 @@ type Store struct {
 	QueryResults map[string]*QueryResult
 	Mu           *sync.Mutex
 
-	Client sheet.QueryClient
-	Ticker *time.Ticker
+	Client      sheet.QueryClient
+	Ticker      *time.Ticker
+	LastUpdated string
 }
 
 func NewStore(client sheet.QueryClient) *Store {
@@ -71,6 +72,8 @@ func (s *Store) QueryInStore(qrCode string) (res *QueryResult, err error) {
 
 // Writes raw query result to store with masking names.
 func (s *Store) WriteToStore(results []sheet.RawQueryResult) {
+	s.LastUpdated = time.Now().Format(DateTimeFormat)
+
 	for _, result := range results {
 		s.QueryResults[result.QRCode] = &QueryResult{
 			Status:               "verified",
@@ -79,7 +82,6 @@ func (s *Store) WriteToStore(results []sheet.RawQueryResult) {
 			QRCode:               result.QRCode,
 			CertificateName:      result.CertificateName,
 			CertificateCreatedAt: result.CertificateCreatedAt,
-			LastUpdated:          time.Now().Format(DateTimeFormat),
 		}
 	}
 }
