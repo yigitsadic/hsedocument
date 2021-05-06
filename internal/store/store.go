@@ -11,7 +11,7 @@ import (
 
 const (
 	BaseUrl        = "https://hsegroup.uz/kurumsal/certificate_verification?qr_code="
-	DateTimeFormat = "04:15 02.01.2006"
+	DateTimeFormat = "15:04 02.01.2006"
 )
 
 var (
@@ -72,7 +72,12 @@ func (s *Store) QueryInStore(qrCode string) (res *QueryResult, err error) {
 
 // Writes raw query result to store with masking names.
 func (s *Store) WriteToStore(results []sheet.RawQueryResult) {
-	s.LastUpdated = time.Now().Format(DateTimeFormat)
+	l, err := time.LoadLocation("Asia/Samarkand")
+	if err != nil {
+		s.LastUpdated = time.Now().UTC().Format(DateTimeFormat)
+	} else {
+		s.LastUpdated = time.Now().In(l).Format(DateTimeFormat)
+	}
 
 	for _, result := range results {
 		s.QueryResults[result.QRCode] = &QueryResult{
