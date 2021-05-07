@@ -2,8 +2,8 @@ package store
 
 import (
 	"errors"
-	"github.com/yigitsadic/sertifikadogrula/internal/name_masker"
-	"github.com/yigitsadic/sertifikadogrula/internal/sheet"
+	"github.com/yigitsadic/hsedocument/internal/name_masker"
+	"github.com/yigitsadic/hsedocument/internal/sheet"
 	"strings"
 	"sync"
 	"time"

@@ -3,8 +3,8 @@ package handlers
 import (
 	"encoding/json"
 	"github.com/go-chi/chi/v5"
-	"github.com/yigitsadic/sertifikadogrula/internal/guard"
-	"github.com/yigitsadic/sertifikadogrula/internal/store"
+	"github.com/yigitsadic/hsedocument/internal/guard"
+	"github.com/yigitsadic/hsedocument/internal/store"
 	"net/http"
 )
 
