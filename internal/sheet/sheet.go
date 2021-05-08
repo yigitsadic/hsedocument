@@ -39,7 +39,7 @@ func (c Client) ReadSheetsAPI() ([]RawQueryResult, error) {
 		return nil, fmt.Errorf("unable to retrieve Sheets client: %v", err)
 	}
 
-	readRange := "Sertifika Veritabanı!A:G"
+	readRange := "Sertifika Veritabanı!A:H"
 	resp, err := srv.Spreadsheets.Values.Get(c.SheetId, readRange).Do()
 	if err != nil {
 		return nil, err
