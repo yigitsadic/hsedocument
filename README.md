@@ -1,6 +1,6 @@
-# Sertifika Doğrula
+# HSE Belge Doğrulama Servisi
 
-1 saatte bir Google Sheets içindeki sertifikalar memory'e alınıyor.
+1 saatte bir Google Sheets içindeki sertifikalar/belgeler memory'e alınıyor.
 
 Gelen request içindeki token ENV içinde verilen token ile karşılaştırılıyor. Eğer eşleşme sağlanırsa
 yanıt dönülüyor.
