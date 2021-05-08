@@ -51,12 +51,9 @@ func main() {
 
 	// Every 1 hour make request to Google Sheets.
 	go func() {
-		for {
-			select {
-			case <-s.Ticker.C:
-				if err = s.FetchFromSheets(); err != nil {
-					log.Println("Error occurred when fetching from Google Sheets. Err:", err)
-				}
+		for _ = range s.Ticker.C {
+			if err = s.FetchFromSheets(); err != nil {
+				log.Println("Error occurred when fetching from Google Sheets. Err:", err)
 			}
 		}
 	}()
