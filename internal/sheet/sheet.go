@@ -2,14 +2,9 @@ package sheet
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"google.golang.org/api/option"
 	"google.golang.org/api/sheets/v4"
-)
-
-var (
-	CannotReadFromGoogleErr = errors.New("cannot read from google")
 )
 
 type RawQueryResult struct {
