@@ -1,16 +1,19 @@
 package store
 
 import (
-	"github.com/yigitsadic/sertifikadogrula/internal/sheet"
+	"errors"
+	"github.com/yigitsadic/hsedocument/internal/sheet"
 	"testing"
 	"time"
 )
+
+var sampleError = errors.New("simple read error")
 
 type errorClient struct {
 }
 
 func (m errorClient) ReadSheetsAPI() ([]sheet.RawQueryResult, error) {
-	return nil, sheet.CannotReadFromGoogleErr
+	return nil, sampleError
 }
 
 type successfulClient struct {
@@ -185,7 +188,7 @@ func TestStore_FetchFromSheets(t *testing.T) {
 	t.Run("it should handle error gracefully", func(t *testing.T) {
 		s := NewStore(errorClient{})
 
-		if err := s.FetchFromSheets(); err != sheet.CannotReadFromGoogleErr {
+		if err := s.FetchFromSheets(); err != sampleError {
 			t.Errorf("expected to get an error while reading")
 		}
 

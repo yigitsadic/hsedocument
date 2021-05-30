@@ -33,11 +33,6 @@ func main() {
 		log.Fatalln("Sheet ID cannot be empty")
 	}
 
-	token := os.Getenv("TOKEN")
-	if token == "" {
-		log.Fatalln("TOKEN cannot be empty")
-	}
-
 	apiKey := os.Getenv("SHEET_API_KEY")
 	if apiKey == "" {
 		log.Fatalln("SHEET_API_KEY cannot be empty")
@@ -64,7 +59,7 @@ func main() {
 		port = "8080"
 	}
 
-	a := guard.Authentication{Secret: token}
+	a := guard.Authentication{}
 
 	r := chi.NewRouter()
 

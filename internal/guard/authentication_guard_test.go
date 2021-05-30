@@ -23,7 +23,7 @@ func TestAuthenticationGuard(t *testing.T) {
 		w.WriteHeader(http.StatusOK)
 	})
 
-	a := Authentication{Secret: "ABC"}
+	a := Authentication{}
 
 	ts := httptest.NewServer(a.Guard(hf))
 	defer ts.Close()
@@ -33,7 +33,7 @@ func TestAuthenticationGuard(t *testing.T) {
 	}{}
 
 	t.Run("it should handle good token", func(t *testing.T) {
-		req, err := buildRequest(t, ts.URL, "ABC")
+		req, err := buildRequest(t, ts.URL)
 		if err != nil {
 			t.Errorf("unexpected to see an error at this stage. err=%s", err)
 		}
@@ -49,28 +49,6 @@ func TestAuthenticationGuard(t *testing.T) {
 
 		if readQrCode != qrCode {
 			t.Errorf("expected to qr code assigned to ctx")
-		}
-	})
-
-	t.Run("it should handle bad token", func(t *testing.T) {
-		req, err := buildRequest(t, ts.URL, "DEF")
-		if err != nil {
-			t.Errorf("unexpected to see an error at this stage. err=%s", err)
-		}
-
-		res, err := client.Do(req)
-		if err != nil {
-			t.Errorf("unexpected to see an error at this stage. err=%s", err)
-		}
-
-		if res != nil && res.StatusCode != http.StatusUnauthorized {
-			t.Errorf("expected to get 401 response")
-		}
-
-		json.NewDecoder(res.Body).Decode(&response)
-
-		if response.Message != "unauthorized" {
-			t.Errorf("unexpected response. got=%+v", response)
 		}
 	})
 
@@ -98,12 +76,11 @@ func TestAuthenticationGuard(t *testing.T) {
 
 }
 
-func buildRequest(t *testing.T, url, token string) (*http.Request, error) {
+func buildRequest(t *testing.T, url string) (*http.Request, error) {
 	t.Helper()
 
 	b := bytes.Buffer{}
 	json.NewEncoder(&b).Encode(map[string]string{
-		"token":   token,
 		"qr_code": qrCode,
 	})
 	return http.NewRequest(http.MethodPost, url, &b)

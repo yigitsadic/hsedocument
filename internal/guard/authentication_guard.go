@@ -7,7 +7,6 @@ import (
 )
 
 type jsonForm struct {
-	Token  string `json:"token"`
 	QrCode string `json:"qr_code"`
 }
 
@@ -20,7 +19,6 @@ var (
 const QRCodeCtxKey = "qrCode"
 
 type Authentication struct {
-	Secret string
 }
 
 func (a *Authentication) Guard(next http.Handler) http.Handler {
@@ -29,7 +27,7 @@ func (a *Authentication) Guard(next http.Handler) http.Handler {
 		json.NewDecoder(request.Body).Decode(&f)
 		defer request.Body.Close()
 
-		if f.Token == a.Secret {
+		if f.QrCode != "" {
 			ctx := context.WithValue(request.Context(), QRCodeCtxKey, f.QrCode)
 
 			next.ServeHTTP(writer, request.WithContext(ctx))
