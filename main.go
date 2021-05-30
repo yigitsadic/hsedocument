@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 	"github.com/yigitsadic/hsedocument/internal/guard"
 	"github.com/yigitsadic/hsedocument/internal/handlers"
 	"github.com/yigitsadic/hsedocument/internal/sheet"
@@ -63,6 +64,19 @@ func main() {
 
 	r := chi.NewRouter()
 
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins: []string{"*"},
+		AllowedMethods: []string{
+			http.MethodHead,
+			http.MethodGet,
+			http.MethodPost,
+			http.MethodPut,
+			http.MethodPatch,
+			http.MethodDelete,
+		},
+		AllowedHeaders:   []string{"*"},
+		AllowCredentials: false,
+	}))
 	r.Use(middleware.Logger)
 	r.Use(a.Guard)
 	handlers.HandleCertificateVerification(r, s)
