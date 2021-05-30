@@ -8,11 +8,12 @@ import (
 )
 
 type RawQueryResult struct {
-	FirstName            string
-	LastName             string
-	QRCode               string
-	CertificateName      string
-	CertificateCreatedAt string
+	FullName        string
+	Company         string
+	QRCode          string
+	EducationName   string
+	EducationDate   string
+	CertificateDate string
 }
 
 type QueryClient interface {
@@ -34,7 +35,7 @@ func (c Client) ReadSheetsAPI() ([]RawQueryResult, error) {
 		return nil, fmt.Errorf("unable to retrieve Sheets client: %v", err)
 	}
 
-	readRange := "Sertifika Veritabanı!A:H"
+	readRange := "Sertifika Veritabanı!A:G"
 	resp, err := srv.Spreadsheets.Values.Get(c.SheetId, readRange).Do()
 	if err != nil {
 		return nil, err
@@ -43,23 +44,25 @@ func (c Client) ReadSheetsAPI() ([]RawQueryResult, error) {
 	var results []RawQueryResult
 
 	for _, row := range resp.Values[1:] {
-		if len(row) < 5 {
+		if len(row) < 7 {
 			continue
 		}
 
-		firstName, ok1 := row[0].(string)
-		lastName, ok2 := row[1].(string)
-		certificateName, ok3 := row[4].(string)
-		certificateDate, ok4 := row[6].(string)
-		referenceCode, ok5 := row[7].(string)
+		fullName, ok1 := row[0].(string)
+		company, ok2 := row[1].(string)
+		educationName, ok3 := row[2].(string)
+		educationDate, ok4 := row[4].(string)
+		referenceCode, ok5 := row[5].(string)
+		certificateCreatedAt, ok6 := row[6].(string)
 
-		if ok1 && ok2 && ok3 && ok4 && ok5 {
+		if ok1 && ok2 && ok3 && ok4 && ok5 && ok6 {
 			results = append(results, RawQueryResult{
-				FirstName:            firstName,
-				LastName:             lastName,
-				QRCode:               referenceCode,
-				CertificateName:      certificateName,
-				CertificateCreatedAt: certificateDate,
+				FullName:        fullName,
+				QRCode:          referenceCode,
+				EducationName:   educationName,
+				Company:         company,
+				EducationDate:   educationDate,
+				CertificateDate: certificateCreatedAt,
 			})
 		} else {
 			continue

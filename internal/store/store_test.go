@@ -22,18 +22,16 @@ type successfulClient struct {
 func (m successfulClient) ReadSheetsAPI() ([]sheet.RawQueryResult, error) {
 	return []sheet.RawQueryResult{
 		{
-			FirstName:            "Aycan",
-			LastName:             "Çotoy",
-			QRCode:               "ABC",
-			CertificateName:      "Lorem",
-			CertificateCreatedAt: "2021-03-15",
+			FullName:        "Aycan Çotoy",
+			QRCode:          "ABC",
+			EducationName:   "Lorem",
+			CertificateDate: "2021-03-15",
 		},
 		{
-			FirstName:            "Yiğit",
-			LastName:             "Sadıç",
-			QRCode:               "DEF",
-			CertificateName:      "Ipsum",
-			CertificateCreatedAt: "2021-04-08",
+			FullName:        "Yiğit Sadıç",
+			QRCode:          "DEF",
+			EducationName:   "Ipsum",
+			CertificateDate: "2021-04-08",
 		},
 	}, nil
 }
@@ -42,17 +40,15 @@ func TestStore_QueryInStore(t *testing.T) {
 	s := NewStore(nil)
 
 	r1 := QueryResult{
-		MaskedFirstName: "Yi***",
-		MaskedLastName:  "Sa***",
-		QRCode:          "ygt",
-		LastUpdated:     time.Now().Format(DateTimeFormat),
+		MaskedFullName: "Yi*** ***ıç",
+		QRCode:         "ygt",
+		LastUpdated:    time.Now().Format(DateTimeFormat),
 	}
 
 	r2 := QueryResult{
-		MaskedFirstName: "Ay***",
-		MaskedLastName:  "Ço***",
-		QRCode:          "aycn",
-		LastUpdated:     time.Now().Format(DateTimeFormat),
+		MaskedFullName: "Ay*** ***oy",
+		QRCode:         "aycn",
+		LastUpdated:    time.Now().Format(DateTimeFormat),
 	}
 
 	s.QueryResults[r1.QRCode] = &r1
@@ -65,12 +61,8 @@ func TestStore_QueryInStore(t *testing.T) {
 			t.Errorf("unexpected to get an error but got=%s", err)
 		}
 
-		if got.MaskedFirstName != r1.MaskedFirstName {
-			t.Errorf("expected return not satisfied for masked first name")
-		}
-
-		if got.MaskedLastName != r1.MaskedLastName {
-			t.Errorf("expected return not satisfied for masked last name")
+		if got.MaskedFullName != r1.MaskedFullName {
+			t.Errorf("expected return not satisfied for masked full name")
 		}
 
 		if got.QRCode != r1.QRCode {
@@ -84,12 +76,8 @@ func TestStore_QueryInStore(t *testing.T) {
 			t.Errorf("unexpected to get an error but got=%s", err)
 		}
 
-		if got.MaskedFirstName != r1.MaskedFirstName {
-			t.Errorf("expected return not satisfied for masked first name")
-		}
-
-		if got.MaskedLastName != r1.MaskedLastName {
-			t.Errorf("expected return not satisfied for masked last name")
+		if got.MaskedFullName != r1.MaskedFullName {
+			t.Errorf("expected return not satisfied for masked full name")
 		}
 
 		if got.QRCode != r1.QRCode {
@@ -115,12 +103,8 @@ func TestStore_QueryInStore(t *testing.T) {
 			t.Errorf("unexpected to get an error but got=%s", err)
 		}
 
-		if got.MaskedFirstName != r1.MaskedFirstName {
-			t.Errorf("expected return not satisfied for masked first name")
-		}
-
-		if got.MaskedLastName != r1.MaskedLastName {
-			t.Errorf("expected return not satisfied for masked last name")
+		if got.MaskedFullName != r1.MaskedFullName {
+			t.Errorf("expected return not satisfied for masked full name")
 		}
 
 		if got.QRCode != r1.QRCode {
@@ -132,31 +116,27 @@ func TestStore_QueryInStore(t *testing.T) {
 func TestStore_WriteToStore(t *testing.T) {
 	input := []sheet.RawQueryResult{
 		{
-			FirstName:            "Aycan",
-			LastName:             "Çotoy",
-			QRCode:               "ABC",
-			CertificateName:      "Lorem",
-			CertificateCreatedAt: "2021-03-15",
+			FullName:        "Aycan Çotoy",
+			QRCode:          "ABC",
+			EducationName:   "Lorem",
+			CertificateDate: "2021-03-15",
 		},
 		{
-			FirstName:            "Yiğit",
-			LastName:             "Sadıç",
-			QRCode:               "DEF",
-			CertificateName:      "Ipsum",
-			CertificateCreatedAt: "2021-04-08",
+			FullName:        "Yiğit Sadıç",
+			QRCode:          "DEF",
+			EducationName:   "Ipsum",
+			CertificateDate: "2021-04-08",
 		},
 	}
 
 	expectedResult := make(map[string]*QueryResult)
 	expectedResult["ABC"] = &QueryResult{
-		MaskedFirstName: "Ay***",
-		MaskedLastName:  "***oy",
+		MaskedFullName:  "Ay*** ***oy",
 		QRCode:          "ABC",
 		CertificateName: "Lorem",
 	}
 	expectedResult["DEF"] = &QueryResult{
-		MaskedFirstName: "Yi***",
-		MaskedLastName:  "***ıç",
+		MaskedFullName:  "Yi*** ***ıç",
 		QRCode:          "DEF",
 		CertificateName: "Ipsum",
 	}
@@ -166,12 +146,8 @@ func TestStore_WriteToStore(t *testing.T) {
 	s.WriteToStore(input)
 
 	for k, v := range s.QueryResults {
-		if expectedResult[k].MaskedFirstName != v.MaskedFirstName {
-			t.Errorf("expected to see %s but got %s", expectedResult[k].MaskedFirstName, v.MaskedFirstName)
-		}
-
-		if expectedResult[k].MaskedLastName != v.MaskedLastName {
-			t.Errorf("expected to see %s but got %s", expectedResult[k].MaskedLastName, v.MaskedLastName)
+		if expectedResult[k].MaskedFullName != v.MaskedFullName {
+			t.Errorf("expected to see %s but got %s", expectedResult[k].MaskedFullName, v.MaskedFullName)
 		}
 
 		if expectedResult[k].QRCode != v.QRCode {

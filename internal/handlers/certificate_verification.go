@@ -19,8 +19,7 @@ func errorResponse(qrCode, lastUpdated string) store.QueryResult {
 
 	return store.QueryResult{
 		Status:               "not_verified",
-		MaskedFirstName:      "",
-		MaskedLastName:       "",
+		MaskedFullName:       "",
 		QRCode:               qrCode,
 		CertificateName:      "",
 		CertificateCreatedAt: "",

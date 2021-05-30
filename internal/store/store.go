@@ -20,8 +20,7 @@ var (
 
 type QueryResult struct {
 	Status               string `json:"status"`
-	MaskedFirstName      string `json:"first_name"`
-	MaskedLastName       string `json:"last_name"`
+	MaskedFullName       string `json:"masked_full_name"`
 	QRCode               string `json:"qr_code"`
 	CertificateName      string `json:"certificate_name"`
 	CertificateCreatedAt string `json:"certificate_created_at"`
@@ -82,11 +81,10 @@ func (s *Store) WriteToStore(results []sheet.RawQueryResult) {
 	for _, result := range results {
 		s.QueryResults[result.QRCode] = &QueryResult{
 			Status:               "verified",
-			MaskedFirstName:      name_masker.MaskFirstName(result.FirstName),
-			MaskedLastName:       name_masker.MaskLastName(result.LastName),
+			MaskedFullName:       name_masker.MaskFullName(result.FullName),
 			QRCode:               result.QRCode,
-			CertificateName:      result.CertificateName,
-			CertificateCreatedAt: result.CertificateCreatedAt,
+			CertificateName:      result.EducationName,
+			CertificateCreatedAt: result.CertificateDate,
 		}
 	}
 }

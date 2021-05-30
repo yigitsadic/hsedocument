@@ -122,8 +122,7 @@ func TestHandleCertificateVerificationFound(t *testing.T) {
 
 	queryResult := store.QueryResult{
 		Status:               "verified",
-		MaskedFirstName:      "Yi***",
-		MaskedLastName:       "***ıç",
+		MaskedFullName:       "Yi*** ***ıç",
 		QRCode:               "ABC",
 		CertificateName:      "İş Güvenliği",
 		CertificateCreatedAt: "15-04-2021",
@@ -165,12 +164,8 @@ func TestHandleCertificateVerificationFound(t *testing.T) {
 		t.Errorf("expected status was %q but got %q", queryResult.Status, responseObj.Status)
 	}
 
-	if queryResult.MaskedFirstName != responseObj.MaskedFirstName {
-		t.Errorf("expected first name was=%q but got=%q", queryResult.MaskedFirstName, responseObj.MaskedFirstName)
-	}
-
-	if queryResult.MaskedLastName != responseObj.MaskedLastName {
-		t.Errorf("expected first name was=%q but got=%q", queryResult.MaskedLastName, responseObj.MaskedLastName)
+	if queryResult.MaskedFullName != responseObj.MaskedFullName {
+		t.Errorf("expected first name was=%q but got=%q", queryResult.MaskedFullName, responseObj.MaskedFullName)
 	}
 
 	if queryResult.CertificateName != responseObj.CertificateName {
