@@ -8,12 +8,13 @@ import (
 )
 
 type RawQueryResult struct {
-	FullName        string
-	Company         string
-	QRCode          string
-	EducationName   string
-	EducationDate   string
-	CertificateDate string
+	FullName           string
+	Company            string
+	QRCode             string
+	EducationName      string
+	EducationDateStart string
+	EducationDateEnd   string
+	CertificateDate    string
 }
 
 type QueryClient interface {
@@ -35,7 +36,7 @@ func (c Client) ReadSheetsAPI() ([]RawQueryResult, error) {
 		return nil, fmt.Errorf("unable to retrieve Sheets client: %v", err)
 	}
 
-	readRange := "Sertifika Veritabanı!A:G"
+	readRange := "Sertifika Veritabanı!A:H"
 	resp, err := srv.Spreadsheets.Values.Get(c.SheetId, readRange).Do()
 	if err != nil {
 		return nil, err
@@ -44,25 +45,27 @@ func (c Client) ReadSheetsAPI() ([]RawQueryResult, error) {
 	var results []RawQueryResult
 
 	for _, row := range resp.Values[1:] {
-		if len(row) < 7 {
+		if len(row) < 8 {
 			continue
 		}
 
 		fullName, ok1 := row[0].(string)
 		company, ok2 := row[1].(string)
 		educationName, ok3 := row[2].(string)
-		educationDate, ok4 := row[4].(string)
-		referenceCode, ok5 := row[5].(string)
-		certificateCreatedAt, ok6 := row[6].(string)
+		educationDateStart, ok4 := row[4].(string)
+		educationDateEnd, ok5 := row[5].(string)
+		referenceCode, ok6 := row[6].(string)
+		certificateCreatedAt, ok7 := row[7].(string)
 
-		if ok1 && ok2 && ok3 && ok4 && ok5 && ok6 {
+		if ok1 && ok2 && ok3 && ok4 && ok5 && ok6 && ok7 {
 			results = append(results, RawQueryResult{
-				FullName:        fullName,
-				QRCode:          referenceCode,
-				EducationName:   educationName,
-				Company:         company,
-				EducationDate:   educationDate,
-				CertificateDate: certificateCreatedAt,
+				FullName:           fullName,
+				QRCode:             referenceCode,
+				EducationName:      educationName,
+				Company:            company,
+				EducationDateStart: educationDateStart,
+				EducationDateEnd:   educationDateEnd,
+				CertificateDate:    certificateCreatedAt,
 			})
 		} else {
 			continue

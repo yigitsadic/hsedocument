@@ -21,8 +21,11 @@ var (
 type QueryResult struct {
 	Status               string `json:"status"`
 	MaskedFullName       string `json:"masked_full_name"`
+	Company              string `json:"company"`
 	QRCode               string `json:"qr_code"`
 	CertificateName      string `json:"certificate_name"`
+	EducationStart       string `json:"education_start"`
+	EducationEnd         string `json:"education_end"`
 	CertificateCreatedAt string `json:"certificate_created_at"`
 	LastUpdated          string `json:"last_updated"`
 }
@@ -82,6 +85,9 @@ func (s *Store) WriteToStore(results []sheet.RawQueryResult) {
 		s.QueryResults[result.QRCode] = &QueryResult{
 			Status:               "verified",
 			MaskedFullName:       name_masker.MaskFullName(result.FullName),
+			Company:              result.Company,
+			EducationStart:       result.EducationDateStart,
+			EducationEnd:         result.EducationDateEnd,
 			QRCode:               result.QRCode,
 			CertificateName:      result.EducationName,
 			CertificateCreatedAt: result.CertificateDate,
